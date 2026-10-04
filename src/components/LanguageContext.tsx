@@ -28,7 +28,7 @@ const translations: Record<string, { en: string; gu: string }> = {
   allHotels: { en: 'All Hotels (Combined)', gu: 'બધી હોટલો (સંયુક્ત)' },
 
   // Roles
-  owner: { en: 'Hotel Owner / Admin', gu: 'હોટલ માલિક (એડમિન)' },
+  owner: { en: 'Hotel Owner / Admin', gu: 'હોટલ એડમિન' },
   staffRole: { en: 'Front Desk Staff', gu: 'રિસેપ્શન સ્ટાફ' },
 
   // Dashboard KPIs

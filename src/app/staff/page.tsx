@@ -116,7 +116,7 @@ export default function StaffManagementPage() {
         <h2 className="text-base font-bold text-slate-900">{isGu ? 'પ્રવેશ પ્રતિબંધિત' : 'Access Denied'}</h2>
         <p className="text-xs text-slate-500 mt-1">
           {isGu
-            ? 'આ વિભાગ ફક્ત હોટલ માલિક (એડમિન) માટે જ ઉપલબ્ધ છે.'
+            ? 'આ વિભાગ ફક્ત હોટલ એડમિન માટે જ ઉપલબ્ધ છે.'
             : 'This section is restricted to hotel owners only.'}
         </p>
       </div>
@@ -196,7 +196,7 @@ export default function StaffManagementPage() {
                           }`}
                         >
                           {st.role === 'owner' ? <ShieldCheck className="w-3 h-3" /> : <UserCheck className="w-3 h-3" />}
-                          {st.role === 'owner' ? (isGu ? 'માલિક (Admin)' : 'Owner') : (isGu ? 'સ્ટાફ (Staff)' : 'Staff')}
+                          {st.role === 'owner' ? (isGu ? 'એડમિન (Admin)' : 'Admin') : (isGu ? 'સ્ટાફ (Staff)' : 'Staff')}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-slate-600 font-mono text-xs">{st.email}</td>
@@ -251,7 +251,7 @@ export default function StaffManagementPage() {
                           }`}
                         >
                           {st.role === 'owner' ? <ShieldCheck className="w-2.5 h-2.5" /> : <UserCheck className="w-2.5 h-2.5" />}
-                          {st.role === 'owner' ? (isGu ? 'માલિક' : 'Owner') : (isGu ? 'સ્ટાફ' : 'Staff')}
+                          {st.role === 'owner' ? (isGu ? 'એડમિન' : 'Admin') : (isGu ? 'સ્ટાફ' : 'Staff')}
                         </span>
                       </div>
                       <div className="text-xs text-slate-600 flex items-center gap-1 mt-0.5 font-mono">
@@ -385,7 +385,7 @@ export default function StaffManagementPage() {
                     {isGu ? 'રિસેપ્શન સ્ટાફ (ફક્ત સોંપાયેલ હોટલ જોઈ શકે)' : 'Staff (Assigned hotels only)'}
                   </option>
                   <option value="owner">
-                    {isGu ? 'હોટલ માલિક (બધી હોટલો અને એડમિન પેનલ)' : 'Owner (Full access to all hotels)'}
+                    {isGu ? 'હોટલ એડમિન (બધી હોટલો અને એડમિન પેનલ)' : 'Admin (Full access to all hotels)'}
                   </option>
                 </select>
               </div>

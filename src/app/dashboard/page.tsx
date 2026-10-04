@@ -265,10 +265,10 @@ export default function DashboardPage() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                    {isGu ? '👑 માલિક એડમિન પેનલ' : '👑 Owner Admin Control Panel'}
+                    {isGu ? '👑 હોટલ એડમિન કંટ્રોલ પેનલ' : '👑 Admin Control Panel'}
                   </h2>
                   <span className="inline-flex items-center justify-center text-center whitespace-nowrap text-[10px] font-black uppercase bg-amber-400 text-slate-950 px-2.5 py-0.5 rounded-full tracking-wider shadow-xs shrink-0 leading-normal">
-                    {isGu ? 'માલિક લૉગિન' : 'Owner Only'}
+                    {isGu ? 'એડમિન' : 'Admin Only'}
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 mt-1 leading-relaxed">

@@ -73,3 +73,47 @@ button:focus, a:focus {
   animation: pulseSubtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Top Toast Spring Animations */
+@keyframes toastSlideDown {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -32px, 0) scale(0.92);
+  }
+  65% {
+    opacity: 1;
+    transform: translate3d(0, 6px, 0) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes toastSlideUp {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -32px, 0) scale(0.92);
+  }
+}
+
+.toast-enter {
+  animation: toastSlideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.toast-exit {
+  animation: toastSlideUp 0.3s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+}
+
+@keyframes toastProgressBar {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+.toast-progress {
+  animation: toastProgressBar 4.2s linear forwards;
+}
+

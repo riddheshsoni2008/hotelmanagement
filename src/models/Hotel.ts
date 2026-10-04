@@ -5,7 +5,7 @@ export interface IHotel extends Document {
   name: string;
   city: string;
   address: string;
-  phone: string;
+  phone?: string;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -28,11 +28,6 @@ const HotelSchema = new Schema<IHotel>(
       required: [true, 'Address is required'],
       trim: true,
     },
-    phone: {
-      type: String,
-      required: [true, 'Phone number is required'],
-      trim: true,
-    },
     isActive: {
       type: Boolean,
       default: true,
@@ -40,10 +35,15 @@ const HotelSchema = new Schema<IHotel>(
   },
   {
     timestamps: true,
+    strict: false,
   }
 );
 
-export const Hotel: Model<IHotel> =
-  mongoose.models.Hotel || mongoose.model<IHotel>('Hotel', HotelSchema);
+// Delete cached model in dev/HMR to guarantee new schema is loaded
+if (mongoose.models.Hotel) {
+  delete mongoose.models.Hotel;
+}
+
+export const Hotel: Model<IHotel> = mongoose.model<IHotel>('Hotel', HotelSchema);
 
 export default Hotel;

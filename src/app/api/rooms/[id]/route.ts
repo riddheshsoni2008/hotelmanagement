@@ -23,23 +23,48 @@ export async function PUT(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Staff can only update room status (available, maintenance, etc.)
-    if (user.role === 'staff') {
-      if (body.status && ['available', 'occupied', 'maintenance'].includes(body.status)) {
-        room.status = body.status;
-        await room.save();
-        return NextResponse.json({ success: true, room });
+    const updateData: Record<string, unknown> = {};
+
+    // Handle status & maintenance duration updates
+    if (body.status && ['available', 'occupied', 'maintenance'].includes(body.status)) {
+      updateData.status = body.status;
+
+      if (body.status === 'maintenance') {
+        let until: Date | null = null;
+        if (body.maintenanceUntil) {
+          until = new Date(body.maintenanceUntil);
+        } else if (body.durationMinutes && Number(body.durationMinutes) > 0) {
+          until = new Date(Date.now() + Number(body.durationMinutes) * 60000);
+        } else {
+          // Default 30 minutes if unspecified
+          until = new Date(Date.now() + 30 * 60000);
+        }
+        updateData.maintenanceUntil = until;
+        updateData.maintenanceReason = body.maintenanceReason?.trim() || 'General Maintenance (સમારકામ)';
+      } else {
+        // Reset maintenance schedule when room is available or occupied
+        updateData.maintenanceUntil = null;
+        updateData.maintenanceReason = null;
       }
-      return NextResponse.json({ error: 'Staff can only update room status' }, { status: 403 });
     }
 
-    // Owner can update all fields
+    // Staff can only update room status / maintenance
+    if (user.role === 'staff') {
+      if (Object.keys(updateData).length === 0) {
+        return NextResponse.json({ error: 'Staff can only update room status' }, { status: 403 });
+      }
+      const updated = await Room.findByIdAndUpdate(id, updateData, { new: true });
+      return NextResponse.json({ success: true, room: updated });
+    }
+
+    // Owner can update other room fields as well
     const parse = roomSchema.partial().safeParse(body);
     if (!parse.success) {
       return NextResponse.json({ error: parse.error.issues[0]?.message }, { status: 400 });
     }
 
-    const updated = await Room.findByIdAndUpdate(id, parse.data, { new: true });
+    const finalData = { ...parse.data, ...updateData };
+    const updated = await Room.findByIdAndUpdate(id, finalData, { new: true });
     return NextResponse.json({ success: true, room: updated });
   } catch (error) {
     console.error('Error updating room:', error);

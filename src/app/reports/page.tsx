@@ -95,7 +95,7 @@ export default function ReportsPage() {
       <div className="p-8 text-center bg-white rounded-2xl border border-slate-200">
         <h2 className="text-base font-bold text-slate-900">{isGu ? 'પ્રવેશ પ્રતિબંધિત' : 'Access Denied'}</h2>
         <p className="text-xs text-slate-500 mt-1">
-          {isGu ? 'આ વિભાગ ફક્ત હોટલ માલિક (એડમિન) માટે જ છે.' : 'This section is restricted to hotel owners only.'}
+          {isGu ? 'આ વિભાગ ફક્ત હોટલ એડમિન માટે જ છે.' : 'This section is restricted to hotel owners only.'}
         </p>
       </div>
     );

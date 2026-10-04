@@ -1,6 +1,15 @@
 import mongoose, { Schema, Document, Model, Types } from 'mongoose';
 
-export type RoomType = 'Single' | 'Double' | 'Deluxe' | 'Suite' | 'Family';
+export type RoomType =
+  | 'Single'
+  | 'Double'
+  | 'Deluxe'
+  | 'Suite'
+  | 'Family'
+  | 'Single AC'
+  | 'Double AC'
+  | 'Deluxe AC'
+  | 'Super Deluxe';
 export type RoomStatus = 'available' | 'occupied' | 'maintenance';
 
 export interface IRoom extends Document {
@@ -11,6 +20,8 @@ export interface IRoom extends Document {
   status: RoomStatus;
   floor?: string;
   pricePerDay?: number;
+  maintenanceUntil?: Date | null;
+  maintenanceReason?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -30,7 +41,17 @@ const RoomSchema = new Schema<IRoom>(
     },
     type: {
       type: String,
-      enum: ['Single', 'Double', 'Deluxe', 'Suite', 'Family'],
+      enum: [
+        'Single',
+        'Double',
+        'Deluxe',
+        'Suite',
+        'Family',
+        'Single AC',
+        'Double AC',
+        'Deluxe AC',
+        'Super Deluxe',
+      ],
       default: 'Double',
       required: true,
     },
@@ -49,6 +70,16 @@ const RoomSchema = new Schema<IRoom>(
       type: Number,
       min: 0,
     },
+    maintenanceUntil: {
+      type: Date,
+      default: null,
+      index: true,
+    },
+    maintenanceReason: {
+      type: String,
+      default: null,
+      trim: true,
+    },
   },
   {
     timestamps: true,
@@ -58,7 +89,11 @@ const RoomSchema = new Schema<IRoom>(
 // Unique roomNumber per hotel
 RoomSchema.index({ hotelId: 1, roomNumber: 1 }, { unique: true });
 
-export const Room: Model<IRoom> =
-  mongoose.models.Room || mongoose.model<IRoom>('Room', RoomSchema);
+// Evict cached model in dev/HMR to guarantee new schema
+if (mongoose.models.Room) {
+  delete mongoose.models.Room;
+}
+
+export const Room: Model<IRoom> = mongoose.model<IRoom>('Room', RoomSchema);
 
 export default Room;

@@ -54,8 +54,11 @@ const UserSchema = new Schema<IUser>(
   }
 );
 
-// Prevent re-compilation of model in dev / HMR
-export const User: Model<IUser> =
-  mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+// Evict cached model in dev/HMR to guarantee new schema
+if (mongoose.models.User) {
+  delete mongoose.models.User;
+}
+
+export const User: Model<IUser> = mongoose.model<IUser>('User', UserSchema);
 
 export default User;

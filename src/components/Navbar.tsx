@@ -13,7 +13,6 @@ import {
   Settings,
   LogOut,
   ChevronDown,
-  Clock,
   Menu,
   X,
   PlusCircle,
@@ -25,7 +24,6 @@ import {
 } from 'lucide-react';
 import { useHotel } from './HotelContext';
 import { useLanguage } from './LanguageContext';
-import { formatToIST, formatTimeIST } from '@/lib/time';
 
 interface NavItem {
   href: string;
@@ -39,23 +37,9 @@ export function Navbar() {
   const pathname = usePathname();
   const { user, hotels, selectedHotelId, setSelectedHotelId, logout } = useHotel();
   const { lang, setLang, toggleLang, isGu } = useLanguage();
-  const [currentTimeFull, setCurrentTimeFull] = useState<string>('');
-  const [currentTimeShort, setCurrentTimeShort] = useState<string>('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
-
-  // Keep IST clock updated every 30 seconds
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setCurrentTimeFull(formatToIST(now));
-      setCurrentTimeShort(formatTimeIST(now));
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 30000);
-    return () => clearInterval(interval);
-  }, []);
 
   // Close menus on route change
   useEffect(() => {
@@ -309,14 +293,6 @@ export function Navbar() {
               </button>
             </div>
 
-            {/* IST Clock (Desktop only) */}
-            <div className="hidden md:flex items-center gap-1.5 text-[11px] text-slate-300 bg-slate-800/60 px-2.5 py-1 rounded-lg border border-slate-700/60 shrink-0 whitespace-nowrap">
-              <Clock className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-              <span className="hidden xl:inline">{currentTimeFull}</span>
-              <span className="xl:hidden">{currentTimeShort}</span>
-              <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">IST</span>
-            </div>
-
             {/* User Profile Pill */}
             <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
               <div className="hidden sm:flex flex-col text-right shrink-0">
@@ -324,7 +300,7 @@ export function Navbar() {
                   {displayName}
                 </span>
                 <span className="text-[10px] text-blue-300 capitalize font-medium leading-none">
-                  {isOwner ? (isGu ? 'માલિક' : 'Owner') : (isGu ? 'સ્ટાફ' : 'Staff')}
+                  {isOwner ? (isGu ? 'એડમિન' : 'Admin') : (isGu ? 'સ્ટાફ' : 'Staff')}
                 </span>
               </div>
               <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-700/80 border border-blue-500/40 flex items-center justify-center text-xs font-bold text-white shadow shrink-0">
@@ -375,10 +351,8 @@ export function Navbar() {
                   <div className="font-bold text-white text-sm truncate">{displayName}</div>
                   <div className="text-[11px] text-blue-400 font-semibold flex items-center gap-1.5">
                     <span>
-                      {isOwner ? (isGu ? '👑 હોટલ માલિક' : '👑 Hotel Owner') : (isGu ? 'રિસેપ્શન સ્ટાફ' : 'Front Desk Staff')}
+                      {isOwner ? (isGu ? '👑 હોટલ એડમિન' : '👑 Hotel Admin') : (isGu ? 'રિસેપ્શન સ્ટાફ' : 'Front Desk Staff')}
                     </span>
-                    <span>•</span>
-                    <span className="text-slate-400 font-medium">IST {currentTimeShort}</span>
                   </div>
                 </div>
               </div>

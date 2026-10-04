@@ -176,7 +176,7 @@ export default function HotelsManagementPage() {
       <div className="p-8 text-center bg-white rounded-2xl border border-slate-200">
         <h2 className="text-base font-bold text-slate-900">{isGu ? 'પરવાનગી નથી' : 'Access Denied'}</h2>
         <p className="text-xs text-slate-500 mt-1">
-          {isGu ? 'આ પાનું ફક્ત હોટલ માલિક (Admin) માટે છે.' : 'This section is restricted to hotel owners only.'}
+          {isGu ? 'આ પાનું ફક્ત હોટલ એડમિન માટે છે.' : 'This section is restricted to hotel owners only.'}
         </p>
       </div>
     );

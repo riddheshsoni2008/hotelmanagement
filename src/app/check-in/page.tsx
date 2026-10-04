@@ -102,11 +102,18 @@ export default function NewCheckInPage() {
         const res = await fetch(`/api/rooms?hotelId=${hotelId}&status=available`);
         if (res.ok) {
           const data = await res.json();
-          setAvailableRooms(data.rooms || []);
-          if (data.rooms && data.rooms.length > 0) {
-            setRoomId(data.rooms[0].id);
+          const rooms: AvailableRoom[] = data.rooms || [];
+          setAvailableRooms(rooms);
+          if (rooms.length > 0) {
+            const first = rooms[0];
+            setRoomId(first.id);
+            if (first.pricePerDay && Number(first.pricePerDay) > 0) {
+              const days = durationUnit === 'days' ? Math.max(1, durationValue) : 1;
+              setAmount(String(Number(first.pricePerDay) * days));
+            }
           } else {
             setRoomId('');
+            setAmount('');
           }
         }
       } catch {
@@ -117,7 +124,28 @@ export default function NewCheckInPage() {
     };
 
     fetchRooms();
-  }, [hotelId, showToast, isGu]);
+  }, [hotelId, showToast, isGu, durationUnit, durationValue]);
+
+  // Handle Room Selection with Auto-fill Amount
+  const handleSelectRoom = (room: AvailableRoom) => {
+    setRoomId(room.id);
+    if (room.pricePerDay && Number(room.pricePerDay) > 0) {
+      const days = durationUnit === 'days' ? Math.max(1, durationValue) : 1;
+      setAmount(String(Number(room.pricePerDay) * days));
+    }
+  };
+
+  // Handle Duration Change with Auto-updating Amount
+  const updateDuration = (val: number, unit: 'hours' | 'days') => {
+    const newVal = Math.max(1, val);
+    setDurationValue(newVal);
+    setDurationUnit(unit);
+    const room = availableRooms.find((r) => r.id === roomId);
+    if (room && room.pricePerDay && Number(room.pricePerDay) > 0) {
+      const days = unit === 'days' ? newVal : 1;
+      setAmount(String(Number(room.pricePerDay) * days));
+    }
+  };
 
   // Phone lookup for returning guests
   const handlePhoneLookup = async (phoneToSearch?: string) => {
@@ -681,7 +709,7 @@ export default function NewCheckInPage() {
                       <button
                         key={room.id}
                         type="button"
-                        onClick={() => setRoomId(room.id)}
+                        onClick={() => handleSelectRoom(room)}
                         className={`p-3 rounded-xl border text-left transition flex flex-col justify-between cursor-pointer ${
                           isSelected
                             ? 'bg-blue-700 border-blue-700 text-white shadow-md shadow-blue-700/25 scale-[1.02]'
@@ -746,13 +774,13 @@ export default function NewCheckInPage() {
                     min="1"
                     required
                     value={durationValue}
-                    onChange={(e) => setDurationValue(Math.max(1, parseInt(e.target.value) || 1))}
+                    onChange={(e) => updateDuration(parseInt(e.target.value) || 1, durationUnit)}
                     className="w-24 px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white"
                   />
                   <div className="flex rounded-xl bg-slate-100 p-1 flex-1">
                     <button
                       type="button"
-                      onClick={() => setDurationUnit('hours')}
+                      onClick={() => updateDuration(durationValue, 'hours')}
                       className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
                         durationUnit === 'hours'
                           ? 'bg-blue-700 text-white shadow-xs'
@@ -763,7 +791,7 @@ export default function NewCheckInPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setDurationUnit('days')}
+                      onClick={() => updateDuration(durationValue, 'days')}
                       className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
                         durationUnit === 'days'
                           ? 'bg-blue-700 text-white shadow-xs'
@@ -801,10 +829,7 @@ export default function NewCheckInPage() {
                     <button
                       key={`${chip.val}-${chip.unit}`}
                       type="button"
-                      onClick={() => {
-                        setDurationValue(chip.val);
-                        setDurationUnit(chip.unit as 'hours' | 'days');
-                      }}
+                      onClick={() => updateDuration(chip.val, chip.unit as 'hours' | 'days')}
                       className={`px-3 py-1.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${
                         isSelected
                           ? 'bg-blue-700 border-blue-700 text-white shadow-sm'
@@ -838,17 +863,32 @@ export default function NewCheckInPage() {
             {/* Amount and Payment mode (Optional) */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  {isGu ? 'રૂમ ભાડું / રકમ (₹)' : 'Amount / Tariff (₹)'}
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="e.g. 1500"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white"
-                />
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                    {isGu ? 'રૂમ ભાડું / રકમ (₹)' : 'Amount / Tariff (₹)'}
+                  </label>
+                  {(() => {
+                    const sel = availableRooms.find((r) => r.id === roomId);
+                    if (!sel || !sel.pricePerDay) return null;
+                    return (
+                      <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
+                        ⚡ {isGu ? 'ઓટોફિલ:' : 'Autofilled:'} ₹{sel.pricePerDay}
+                        {durationUnit === 'days' && durationValue > 1 && ` × ${durationValue} દિવસ = ₹${Number(sel.pricePerDay) * durationValue}`}
+                      </span>
+                    );
+                  })()}
+                </div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="e.g. 1500"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="w-full pl-7 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition"
+                  />
+                </div>
               </div>
 
               <div>

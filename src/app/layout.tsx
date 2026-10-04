@@ -6,6 +6,7 @@ import { HotelProvider } from '@/components/HotelContext';
 import { LanguageProvider } from '@/components/LanguageContext';
 import { Navbar } from '@/components/Navbar';
 import { CheckOutAlertModal } from '@/components/CheckOutAlertModal';
+import { MaintenanceAlertModal } from '@/components/MaintenanceAlertModal';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -35,6 +36,7 @@ export default function RootLayout({
             <ToastProvider>
               <Navbar />
               <CheckOutAlertModal />
+              <MaintenanceAlertModal />
               <main className="flex-1 w-full max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 pb-6">
                 {children}
               </main>

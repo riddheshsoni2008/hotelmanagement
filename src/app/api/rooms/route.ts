@@ -49,6 +49,8 @@ export async function GET(request: NextRequest) {
         status: r.status,
         floor: r.floor,
         pricePerDay: r.pricePerDay,
+        maintenanceUntil: r.maintenanceUntil ? new Date(r.maintenanceUntil).toISOString() : null,
+        maintenanceReason: r.maintenanceReason || null,
       })),
     });
   } catch (error) {
