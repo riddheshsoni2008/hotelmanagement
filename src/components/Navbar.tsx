@@ -20,6 +20,8 @@ import {
   Languages,
   Crown,
   MapPin,
+  Plus,
+  LayoutGrid,
 } from 'lucide-react';
 import { useHotel } from './HotelContext';
 import { useLanguage } from './LanguageContext';
@@ -284,7 +286,7 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={() => setLang('gu')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1 ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer flex items-center justify-center text-center gap-1 ${
                   isGu
                     ? 'bg-amber-400 text-slate-950 shadow-sm'
                     : 'text-slate-400 hover:text-white'
@@ -296,7 +298,7 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={() => setLang('en')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1 ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer flex items-center justify-center text-center gap-1 ${
                   !isGu
                     ? 'bg-blue-600 text-white shadow-sm'
                     : 'text-slate-400 hover:text-white'
@@ -352,132 +354,236 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown Drawer */}
+      {/* Mobile Modern Bottom Action Sheet (Native Mobile Feel) */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-800 bg-slate-900 px-4 py-3 space-y-2.5 animate-in slide-in-from-top-2">
-          {/* Mobile Hotel Switcher or Locked Hotel display */}
-          <div className="pb-2 border-b border-slate-800 space-y-1.5">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-              {isGu ? 'હોટલ પ્રોપર્ટી:' : 'Selected Hotel:'}
-            </span>
-            {currentAssignedHotel ? (
-              <div className="flex items-center gap-2 bg-emerald-950/70 border border-emerald-700/60 rounded-xl p-2 text-xs font-semibold text-emerald-300">
-                <MapPin className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span className="truncate">{currentAssignedHotel.name} ({currentAssignedHotel.city})</span>
+        <div className="lg:hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex flex-col justify-end animate-in fade-in duration-200">
+          {/* Backdrop click to dismiss */}
+          <div className="flex-1 w-full" onClick={() => setMobileMenuOpen(false)} />
+
+          {/* Sheet Container */}
+          <div className="bg-slate-900 border-t border-slate-750 rounded-t-3xl p-5 pb-8 space-y-4 max-w-lg mx-auto w-full animate-in slide-in-from-bottom duration-300 shadow-2xl relative select-none">
+            {/* Sheet Grab Handle */}
+            <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto -mt-1 mb-2" />
+
+            {/* Header: User Profile Card & Close Button */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-extrabold text-white shadow-md text-base shrink-0 ring-2 ring-blue-500/30">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <div className="font-bold text-white text-sm truncate">{displayName}</div>
+                  <div className="text-[11px] text-blue-400 font-semibold flex items-center gap-1.5">
+                    <span>
+                      {isOwner ? (isGu ? '👑 હોટલ માલિક' : '👑 Hotel Owner') : (isGu ? 'રિસેપ્શન સ્ટાફ' : 'Front Desk Staff')}
+                    </span>
+                    <span>•</span>
+                    <span className="text-slate-400 font-medium">IST {currentTimeShort}</span>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <select
-                aria-label="Select Hotel"
-                value={selectedHotelId}
-                onChange={(e) => {
-                  setSelectedHotelId(e.target.value);
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs font-medium text-white focus:outline-none"
+
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-750 text-slate-300 flex items-center justify-center cursor-pointer transition active:scale-90"
+                title="Close"
               >
-                {isOwner && (
-                  <option value="all">
-                    {isGu ? '🏨 બધી હોટલો (All Combined)' : 'All Hotels (Combined)'}
-                  </option>
-                )}
-                {hotels.map((h) => (
-                  <option key={h.id} value={h.id}>
-                    {h.name} ({h.city})
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-
-          {/* User info row & Clock */}
-          <div className="flex items-center justify-between pb-2 border-b border-slate-800 text-xs text-slate-400">
-            <div className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-blue-400" />
-              <span>IST: {currentTimeShort}</span>
+                <X className="w-4 h-4" />
+              </button>
             </div>
-            <span className="capitalize text-blue-400 font-bold bg-blue-950/80 px-2 py-0.5 rounded border border-blue-800/40">
-              {isOwner ? (isGu ? 'હોટલ માલિક' : 'Owner') : (isGu ? 'રિસેપ્શન સ્ટાફ' : 'Staff')}
-            </span>
-          </div>
 
-          {/* Nav links */}
-          <div className="space-y-1">
-            {allNavLinks.map((link) => {
-              const Icon = link.icon;
-              const isActive = pathname === link.href || (link.href !== '/dashboard' && pathname.startsWith(link.href));
-              const displayLabel = isGu ? link.labelGu : link.label;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition ${
-                    link.highlight
-                      ? 'bg-blue-600 text-white'
-                      : isActive
-                      ? 'bg-slate-800 text-blue-400 font-bold'
-                      : 'text-slate-300 hover:bg-slate-800'
-                  }`}
+            {/* Hotel Property Switcher */}
+            <div className="space-y-1.5 bg-slate-850 p-3 rounded-2xl border border-slate-800">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                {isGu ? 'હોટલ પ્રોપર્ટી (Active Property):' : 'Active Hotel Property:'}
+              </span>
+              {currentAssignedHotel ? (
+                <div className="flex items-center gap-2 text-xs font-semibold text-emerald-300">
+                  <MapPin className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span className="truncate">{currentAssignedHotel.name} ({currentAssignedHotel.city})</span>
+                </div>
+              ) : (
+                <select
+                  aria-label="Select Hotel"
+                  value={selectedHotelId}
+                  onChange={(e) => {
+                    setSelectedHotelId(e.target.value);
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none"
                 >
-                  <Icon className={`w-4 h-4 ${link.highlight ? 'text-white' : 'text-blue-400'}`} />
-                  <span>{displayLabel}</span>
-                </Link>
-              );
-            })}
+                  {isOwner && (
+                    <option value="all">
+                      {isGu ? '🏨 બધી હોટલો (All Combined)' : 'All Hotels (Combined)'}
+                    </option>
+                  )}
+                  {hotels.map((h) => (
+                    <option key={h.id} value={h.id}>
+                      {h.name} ({h.city})
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
 
-            {/* Mobile Logout Button */}
+            {/* Owner Management Modules (2-Column Grid) */}
+            {isOwner && (
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">
+                  {isGu ? 'એડમિન કંટ્રોલ (Owner Controls):' : 'Owner Management Modules:'}
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  <Link
+                    href="/hotels"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-750 transition active:scale-95 group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+                      <Building2 className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-white group-hover:text-blue-300 truncate">
+                        {isGu ? 'હોટલ શાખાઓ' : 'Hotels'}
+                      </div>
+                      <div className="text-[10px] text-slate-400">{hotels.length} {isGu ? 'શાખા' : 'Properties'}</div>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/staff"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-750 transition active:scale-95 group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                      <Users2 className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-white group-hover:text-emerald-300 truncate">
+                        {isGu ? 'સ્ટાફ લૉગિન' : 'Staff'}
+                      </div>
+                      <div className="text-[10px] text-slate-400">{isGu ? 'મેનેજ સ્ટાફ' : 'Accounts'}</div>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/reports"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-750 transition active:scale-95 group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
+                      <BarChart3 className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-white group-hover:text-purple-300 truncate">
+                        {isGu ? 'રિપોર્ટ્સ' : 'Reports'}
+                      </div>
+                      <div className="text-[10px] text-slate-400">{isGu ? 'નાણાકીય' : 'Analytics'}</div>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/settings"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-750 transition active:scale-95 group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                      <Settings className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-white group-hover:text-amber-300 truncate">
+                        {isGu ? 'સેટિંગ્સ' : 'Settings'}
+                      </div>
+                      <div className="text-[10px] text-slate-400">{isGu ? 'ડોક્યુમેન્ટ સફાઈ' : 'System'}</div>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {/* Logout button */}
             <button
-              onClick={() => logout()}
+              onClick={() => {
+                setMobileMenuOpen(false);
+                logout();
+              }}
               type="button"
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-red-400 hover:bg-red-500/10 transition mt-2 border-t border-slate-800 pt-3"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-red-400 hover:text-white bg-red-950/40 hover:bg-red-900/60 border border-red-800/50 transition cursor-pointer active:scale-95"
             >
               <LogOut className="w-4 h-4 text-red-400" />
-              <span>{isGu ? 'લૉગઆઉટ કરો (Logout)' : 'Logout'}</span>
+              <span>{isGu ? 'લૉગઆઉટ કરો (Logout)' : 'Sign Out'}</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* Mobile Bottom Navigation Bar (Optimized for Thumb Access on Phone) */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/98 backdrop-blur-md border-t border-slate-800 px-1 py-1 flex items-center justify-around shadow-2xl safe-area-bottom">
+      {/* 🚀 Modern Floating Island Bottom Dock (Symmetrical 5 Tabs with Center Check-in FAB) */}
+      <nav
+        aria-label="Mobile Navigation"
+        className="lg:hidden fixed bottom-3 left-3 right-3 z-40 max-w-md mx-auto bg-slate-900/95 backdrop-blur-2xl border border-slate-750/90 rounded-2xl px-2 py-1.5 flex items-center justify-around shadow-2xl shadow-slate-950/70 select-none"
+      >
+        {/* Tab 1: Dashboard */}
         <Link
           href="/dashboard"
-          className={`flex flex-col items-center py-1 px-2.5 rounded-xl text-[10px] font-bold transition ${
-            pathname === '/dashboard' ? 'text-blue-400' : 'text-slate-400'
+          className={`flex flex-col items-center py-1 px-3 rounded-xl text-[10px] font-bold transition-all active:scale-90 ${
+            pathname === '/dashboard'
+              ? 'text-blue-400 bg-blue-500/15'
+              : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <CalendarCheck className="w-5 h-5 mb-0.5" />
           <span>{isGu ? 'ડેશબોર્ડ' : 'Dashboard'}</span>
         </Link>
 
-        <Link
-          href="/check-in"
-          className="flex flex-col items-center -mt-5 bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-full shadow-xl shadow-blue-600/40 border-2 border-slate-900 active:scale-95 transition"
-          title={isGu ? 'નવો ચેક-ઇન' : 'New Check-in'}
-        >
-          <PlusCircle className="w-6 h-6" />
-        </Link>
-
+        {/* Tab 2: Stays */}
         <Link
           href="/stays"
-          className={`flex flex-col items-center py-1 px-2.5 rounded-xl text-[10px] font-bold transition ${
-            pathname.startsWith('/stays') ? 'text-blue-400' : 'text-slate-400'
+          className={`flex flex-col items-center py-1 px-3 rounded-xl text-[10px] font-bold transition-all active:scale-90 ${
+            pathname.startsWith('/stays')
+              ? 'text-blue-400 bg-blue-500/15'
+              : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <ClipboardList className="w-5 h-5 mb-0.5" />
           <span>{isGu ? 'રોકાણ' : 'Stays'}</span>
         </Link>
 
+        {/* Tab 3: CENTER FAST ACTION FAB (New Check-in) */}
+        <Link
+          href="/check-in"
+          className="flex flex-col items-center -mt-6 bg-gradient-to-tr from-blue-600 via-blue-500 to-indigo-600 text-white p-3.5 rounded-full shadow-xl shadow-blue-500/40 ring-4 ring-slate-900 active:scale-90 transition-all duration-150 cursor-pointer group"
+          title={isGu ? 'નવો ચેક-ઇન' : 'New Check-in'}
+        >
+          <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform duration-200" />
+        </Link>
+
+        {/* Tab 4: Rooms */}
         <Link
           href="/rooms"
-          className={`flex flex-col items-center py-1 px-2.5 rounded-xl text-[10px] font-bold transition ${
-            pathname.startsWith('/rooms') ? 'text-blue-400' : 'text-slate-400'
+          className={`flex flex-col items-center py-1 px-3 rounded-xl text-[10px] font-bold transition-all active:scale-90 ${
+            pathname.startsWith('/rooms')
+              ? 'text-blue-400 bg-blue-500/15'
+              : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <BedDouble className="w-5 h-5 mb-0.5" />
           <span>{isGu ? 'રૂમ' : 'Rooms'}</span>
         </Link>
-      </div>
+
+        {/* Tab 5: Menu / More */}
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen(true)}
+          className={`flex flex-col items-center py-1 px-3 rounded-xl text-[10px] font-bold transition-all active:scale-90 cursor-pointer ${
+            mobileMenuOpen || ['/hotels', '/staff', '/reports', '/settings'].some((p) => pathname.startsWith(p))
+              ? 'text-amber-400 bg-amber-400/15'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <LayoutGrid className="w-5 h-5 mb-0.5" />
+          <span>{isGu ? 'મેનૂ' : 'Menu'}</span>
+        </button>
+      </nav>
     </header>
   );
 }

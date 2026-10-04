@@ -24,9 +24,18 @@ body {
   min-height: 100vh;
 }
 
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Clean mobile touch interactions */
 button, a, input, select, textarea {
   touch-action: manipulation;
+  outline: none;
+}
+
+button:focus, a:focus {
+  outline: none;
 }
 
 /* Custom scrollbars */

@@ -258,20 +258,20 @@ export default function DashboardPage() {
       {isOwner && (
         <div className="bg-gradient-to-r from-slate-900 via-slate-850 to-blue-950 border border-amber-500/30 rounded-2xl p-4 sm:p-5 text-white shadow-xl space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 shrink-0">
+            <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 shrink-0 mt-0.5 sm:mt-0 shadow-inner">
                 <Crown className="w-5 h-5" />
               </div>
-              <div>
-                <div className="flex items-center gap-2">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                    {isGu ? '👑 માલિક એડમિન પેનલ (Admin Control Panel)' : '👑 Owner Admin Control Panel'}
+                    {isGu ? '👑 માલિક એડમિન પેનલ' : '👑 Owner Admin Control Panel'}
                   </h2>
-                  <span className="text-[10px] font-extrabold uppercase bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full tracking-wider">
+                  <span className="inline-flex items-center justify-center text-center whitespace-nowrap text-[10px] font-black uppercase bg-amber-400 text-slate-950 px-2.5 py-0.5 rounded-full tracking-wider shadow-xs shrink-0 leading-normal">
                     {isGu ? 'માલિક લૉગિન' : 'Owner Only'}
                   </span>
                 </div>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                   {isGu
                     ? 'બધી હોટલ શાખાઓ, સ્ટાફ લૉગિન, અને સંપૂર્ણ બિઝનેસ રિપોર્ટ્સનું નિયંત્રણ ફક્ત તમારી પાસે છે.'
                     : 'Master administration: Add properties, configure dedicated staff logins, and view cross-property financial reports.'}
@@ -279,12 +279,12 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 self-start sm:self-auto">
+            <div className="flex items-center gap-2 self-stretch sm:self-auto shrink-0">
               <Link
                 href="/hotels"
-                className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl shadow-md transition flex items-center gap-1.5"
+                className="w-full sm:w-auto px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl shadow-md transition flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer text-center"
               >
-                <PlusCircle className="w-3.5 h-3.5" />
+                <PlusCircle className="w-4 h-4 shrink-0" />
                 <span>{isGu ? '+ નવી હોટલ & લૉગિન' : '+ Add Hotel & Login'}</span>
               </Link>
             </div>
@@ -294,76 +294,76 @@ export default function DashboardPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
             <Link
               href="/hotels"
-              className="bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 p-3 rounded-xl transition group flex items-center justify-between"
+              className="bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 p-2.5 sm:p-3 rounded-xl transition group flex items-center justify-between min-w-0"
             >
-              <div className="flex items-center gap-2.5 min-w-0">
+              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
                 <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
                   <Building2 className="w-4 h-4" />
                 </div>
-                <div className="truncate">
-                  <div className="text-xs font-bold text-white group-hover:text-blue-300 transition">
+                <div className="min-w-0">
+                  <div className="text-xs font-bold text-white group-hover:text-blue-300 transition truncate">
                     {isGu ? 'હોટલ શાખાઓ' : 'Hotel Properties'}
                   </div>
-                  <div className="text-[10px] text-slate-400">
+                  <div className="text-[10px] text-slate-400 truncate">
                     {hotels.length} {isGu ? 'હોટલ નોંધાયેલ' : 'Hotels'}
                   </div>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition shrink-0" />
+              <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition shrink-0 hidden sm:block" />
             </Link>
 
             <Link
               href="/staff"
-              className="bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 p-3 rounded-xl transition group flex items-center justify-between"
+              className="bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 p-2.5 sm:p-3 rounded-xl transition group flex items-center justify-between min-w-0"
             >
-              <div className="flex items-center gap-2.5 min-w-0">
+              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
                 <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
                   <Users2 className="w-4 h-4" />
                 </div>
-                <div className="truncate">
-                  <div className="text-xs font-bold text-white group-hover:text-emerald-300 transition">
+                <div className="min-w-0">
+                  <div className="text-xs font-bold text-white group-hover:text-emerald-300 transition truncate">
                     {isGu ? 'સ્ટાફ લૉગિન' : 'Staff Accounts'}
                   </div>
-                  <div className="text-[10px] text-slate-400">{isGu ? 'મેનેજ સ્ટાફ' : 'Manage Logins'}</div>
+                  <div className="text-[10px] text-slate-400 truncate">{isGu ? 'મેનેજ સ્ટાફ' : 'Manage Logins'}</div>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition shrink-0" />
+              <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition shrink-0 hidden sm:block" />
             </Link>
 
             <Link
               href="/reports"
-              className="bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 p-3 rounded-xl transition group flex items-center justify-between"
+              className="bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 p-2.5 sm:p-3 rounded-xl transition group flex items-center justify-between min-w-0"
             >
-              <div className="flex items-center gap-2.5 min-w-0">
+              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
                 <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
                   <BarChart3 className="w-4 h-4" />
                 </div>
-                <div className="truncate">
-                  <div className="text-xs font-bold text-white group-hover:text-purple-300 transition">
+                <div className="min-w-0">
+                  <div className="text-xs font-bold text-white group-hover:text-purple-300 transition truncate">
                     {isGu ? 'નાણાકીય રિપોર્ટ' : 'Revenue Reports'}
                   </div>
-                  <div className="text-[10px] text-slate-400">{isGu ? 'આવક & હિસાબ' : 'Analytics & CSV'}</div>
+                  <div className="text-[10px] text-slate-400 truncate">{isGu ? 'આવક & હિસાબ' : 'Analytics & CSV'}</div>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition shrink-0" />
+              <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition shrink-0 hidden sm:block" />
             </Link>
 
             <Link
               href="/settings"
-              className="bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 p-3 rounded-xl transition group flex items-center justify-between"
+              className="bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 p-2.5 sm:p-3 rounded-xl transition group flex items-center justify-between min-w-0"
             >
-              <div className="flex items-center gap-2.5 min-w-0">
+              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
                 <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
                   <Settings className="w-4 h-4" />
                 </div>
-                <div className="truncate">
-                  <div className="text-xs font-bold text-white group-hover:text-amber-300 transition">
+                <div className="min-w-0">
+                  <div className="text-xs font-bold text-white group-hover:text-amber-300 transition truncate">
                     {isGu ? 'સિસ્ટમ સેટિંગ્સ' : 'System Settings'}
                   </div>
-                  <div className="text-[10px] text-slate-400">{isGu ? 'ડોક્યુમેન્ટ સફાઈ' : 'Storage Optimizer'}</div>
+                  <div className="text-[10px] text-slate-400 truncate">{isGu ? 'ડોક્યુમેન્ટ સફાઈ' : 'Storage Optimizer'}</div>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition shrink-0" />
+              <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition shrink-0 hidden sm:block" />
             </Link>
           </div>
 
@@ -413,7 +413,7 @@ export default function DashboardPage() {
                 <h2 className="text-sm sm:text-base font-bold text-blue-950">
                   {currentViewTitle}
                 </h2>
-                <span className="text-[10px] bg-blue-200/80 text-blue-900 font-bold px-2 py-0.5 rounded-full">
+                <span className="inline-flex items-center justify-center text-center whitespace-nowrap text-[10px] bg-blue-200/80 text-blue-900 font-bold px-2.5 py-0.5 rounded-full leading-normal">
                   {isGu ? 'તમારી હોટલ શાખા' : 'Assigned Property'}
                 </span>
               </div>
