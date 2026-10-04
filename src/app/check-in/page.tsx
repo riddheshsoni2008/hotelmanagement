@@ -246,13 +246,19 @@ export default function NewCheckInPage() {
         documents: documentsPayload,
       };
 
-      const res = await fetch('/api/check-in', {
+      const res = await fetch('/api/stays', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      let data: { error?: string; stayId?: string } = {};
+      try {
+        data = await res.json();
+      } catch {
+        // Fallback for non-JSON responses
+      }
+
       if (!res.ok) {
         showToast(data.error || (isGu ? 'ચેક-ઇન નિષ્ફળ ગયું' : 'Failed to complete check-in'), 'error');
         return;
@@ -260,8 +266,10 @@ export default function NewCheckInPage() {
 
       showToast(isGu ? 'મહેમાનનું ચેક-ઇન સફળતાપૂર્વક થઈ ગયું!' : 'Guest checked in successfully!', 'success');
       router.push(`/stays/${data.stayId}`);
-    } catch {
-      showToast(isGu ? 'ચેક-ઇન સબમિટ કરવામાં ભૂલ આવી' : 'Error submitting check-in', 'error');
+    } catch (err: unknown) {
+      console.error('Check-in error:', err);
+      const msg = err instanceof Error ? err.message : '';
+      showToast(msg || (isGu ? 'ચેક-ઇન સબમિટ કરવામાં ભૂલ આવી' : 'Error submitting check-in'), 'error');
     } finally {
       setSubmitting(false);
     }
