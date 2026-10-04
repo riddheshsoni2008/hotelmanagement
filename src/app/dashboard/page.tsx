@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Users,
   BedDouble,
@@ -66,6 +67,7 @@ interface DashboardStats {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { user, selectedHotelId, setSelectedHotelId, hotels } = useHotel();
   const { showToast } = useToast();
   const { isGu } = useLanguage();
@@ -75,6 +77,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [stayFilter, setStayFilter] = useState<'all' | 'overstay'>('all');
+  const [highlightedSection, setHighlightedSection] = useState(false);
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
   const [nowTick, setNowTick] = useState(Date.now());
 
@@ -202,7 +206,33 @@ export default function DashboardPage() {
     }
   };
 
+  const scrollToCheckedIn = () => {
+    setStayFilter('all');
+    setSearchTerm('');
+    const el = document.getElementById('active-stays-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setHighlightedSection(true);
+      setTimeout(() => setHighlightedSection(false), 2200);
+    }
+  };
+
+  const scrollToOverstay = () => {
+    setStayFilter('overstay');
+    setSearchTerm('');
+    const el = document.getElementById('active-stays-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setHighlightedSection(true);
+      setTimeout(() => setHighlightedSection(false), 2200);
+    }
+  };
+
   const filteredStays = activeStays.filter((s) => {
+    if (stayFilter === 'overstay') {
+      const isItemOverstay = s.isOverstay || new Date(s.expectedCheckOutAt).getTime() < nowTick;
+      if (!isItemOverstay) return false;
+    }
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
     return (
@@ -494,129 +524,220 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* KPI Stats Cards (Bilingual English + Gujarati) */}
+      {/* KPI Stats Cards (All Interactive Buttons with Smooth Routing & Scrolling) */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
-        {/* Currently Checked In */}
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+        {/* 1. Currently Checked In (Scrolls to Checked-in People Section) */}
+        <button
+          type="button"
+          onClick={scrollToCheckedIn}
+          className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs hover:shadow-lg hover:border-blue-400 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-150 flex flex-col justify-between text-left cursor-pointer group focus:outline-none focus:ring-2 focus:ring-blue-500"
+          title={isGu ? 'હાલમાં રોકાયેલા મહેમાનોની યાદી જુઓ' : 'Click to view checked-in guests below'}
+        >
+          <div className="flex items-center justify-between text-slate-500 w-full">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-700 group-hover:text-blue-700 transition">
               {isGu ? 'હાલમાં રોકાયેલા' : 'Checked In'}
             </span>
-            <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-all duration-200 shadow-xs">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2">
-            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+          <div className="mt-2 w-full">
+            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 group-hover:text-blue-700 transition">
               {loading ? '-' : stats?.currentlyCheckedIn || 0}
             </div>
-            <div className="text-[11px] text-slate-500 mt-0.5 font-medium">
-              {isGu ? 'રૂમમાં હાજર મહેમાનો' : 'Active guests in rooms'}
+            <div className="text-[11px] text-slate-500 mt-1 font-medium flex items-center justify-between">
+              <span>{isGu ? 'રૂમમાં હાજર મહેમાનો' : 'Active guests in rooms'}</span>
+              <span className="text-blue-600 font-bold text-[10px] bg-blue-50 group-hover:bg-blue-100 px-1.5 py-0.5 rounded-md transition flex items-center gap-0.5">
+                {isGu ? 'જુઓ ↓' : 'View ↓'}
+              </span>
             </div>
           </div>
-        </div>
+        </button>
 
-        {/* Available Rooms */}
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+        {/* 2. Available Rooms (Navigates to Rooms Management) */}
+        <button
+          type="button"
+          onClick={() => router.push('/rooms?status=available')}
+          className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs hover:shadow-lg hover:border-emerald-400 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-150 flex flex-col justify-between text-left cursor-pointer group focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          title={isGu ? 'ખાલી રૂમ જુઓ અને મેનેજ કરો' : 'Click to view available rooms'}
+        >
+          <div className="flex items-center justify-between text-slate-500 w-full">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 group-hover:text-emerald-700 transition">
               {isGu ? 'ખાલી રૂમ (ઉપલબ્ધ)' : 'Available Rooms'}
             </span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white flex items-center justify-center transition-all duration-200 shadow-xs">
               <BedDouble className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2">
-            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600">
+          <div className="mt-2 w-full">
+            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 group-hover:text-emerald-700 transition">
               {loading ? '-' : stats?.availableRooms || 0}
             </div>
-            <div className="text-[11px] text-slate-500 mt-0.5 font-medium">
-              {isGu ? `કુલ ${stats?.totalRooms || 0} રૂમમાંથી` : `Out of ${stats?.totalRooms || 0} total rooms`}
+            <div className="text-[11px] text-slate-500 mt-1 font-medium flex items-center justify-between">
+              <span>{isGu ? `કુલ ${stats?.totalRooms || 0} રૂમમાંથી` : `Out of ${stats?.totalRooms || 0} total rooms`}</span>
+              <span className="text-emerald-600 font-bold text-[10px] bg-emerald-50 group-hover:bg-emerald-100 px-1.5 py-0.5 rounded-md transition flex items-center gap-0.5">
+                {isGu ? 'રૂમ →' : 'Rooms →'}
+              </span>
             </div>
           </div>
-        </div>
+        </button>
 
-        {/* Today's Check-ins */}
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-indigo-800">
+        {/* 3. Today's Check-ins (Navigates to Stays Log - Checked In) */}
+        <button
+          type="button"
+          onClick={() => router.push('/stays?status=checked_in')}
+          className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs hover:shadow-lg hover:border-indigo-400 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-150 flex flex-col justify-between text-left cursor-pointer group focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          title={isGu ? 'આજના ચેક-ઇન થયેલ મહેમાનો જુઓ' : "Click to view today's check-ins"}
+        >
+          <div className="flex items-center justify-between text-slate-500 w-full">
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-800 group-hover:text-indigo-700 transition">
               {isGu ? 'આજના ચેક-ઇન' : "Today's In"}
             </span>
-            <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center transition-all duration-200 shadow-xs">
               <ArrowDownLeft className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2">
-            <div className="text-2xl sm:text-3xl font-extrabold text-indigo-900">
+          <div className="mt-2 w-full">
+            <div className="text-2xl sm:text-3xl font-extrabold text-indigo-900 group-hover:text-indigo-700 transition">
               {loading ? '-' : stats?.todayCheckIns || 0}
             </div>
-            <div className="text-[11px] text-slate-500 mt-0.5 font-medium">
-              {isGu ? 'આજે આવેલા નવા મહેમાન' : 'Arrivals since midnight'}
+            <div className="text-[11px] text-slate-500 mt-1 font-medium flex items-center justify-between">
+              <span>{isGu ? 'આજે આવેલા નવા મહેમાન' : 'Arrivals since midnight'}</span>
+              <span className="text-indigo-600 font-bold text-[10px] bg-indigo-50 group-hover:bg-indigo-100 px-1.5 py-0.5 rounded-md transition flex items-center gap-0.5">
+                {isGu ? 'યાદી →' : 'List →'}
+              </span>
             </div>
           </div>
-        </div>
+        </button>
 
-        {/* Today's Check-outs */}
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+        {/* 4. Today's Check-outs (Navigates to Stays Log - Checked Out) */}
+        <button
+          type="button"
+          onClick={() => router.push('/stays?status=checked_out')}
+          className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs hover:shadow-lg hover:border-slate-400 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-150 flex flex-col justify-between text-left cursor-pointer group focus:outline-none focus:ring-2 focus:ring-slate-500"
+          title={isGu ? 'આજે ચેક-આઉટ થયેલા મહેમાનો જુઓ' : "Click to view today's check-outs"}
+        >
+          <div className="flex items-center justify-between text-slate-500 w-full">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-700 group-hover:text-slate-900 transition">
               {isGu ? 'આજના ચેક-આઉટ' : "Today's Out"}
             </span>
-            <div className="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 group-hover:bg-slate-700 group-hover:text-white flex items-center justify-center transition-all duration-200 shadow-xs">
               <ArrowUpRight className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2">
-            <div className="text-2xl sm:text-3xl font-extrabold text-slate-700">
+          <div className="mt-2 w-full">
+            <div className="text-2xl sm:text-3xl font-extrabold text-slate-700 group-hover:text-slate-900 transition">
               {loading ? '-' : stats?.todayCheckOuts || 0}
             </div>
-            <div className="text-[11px] text-slate-500 mt-0.5 font-medium">
-              {isGu ? 'આજે પૂર્ણ થયેલ રોકાણ' : 'Departures completed'}
+            <div className="text-[11px] text-slate-500 mt-1 font-medium flex items-center justify-between">
+              <span>{isGu ? 'આજે પૂર્ણ થયેલ રોકાણ' : 'Departures completed'}</span>
+              <span className="text-slate-700 font-bold text-[10px] bg-slate-100 group-hover:bg-slate-200 px-1.5 py-0.5 rounded-md transition flex items-center gap-0.5">
+                {isGu ? 'યાદી →' : 'List →'}
+              </span>
             </div>
           </div>
-        </div>
+        </button>
 
-        {/* Overstay Alert Card */}
-        <div
-          className={`col-span-2 sm:col-span-1 p-4 rounded-2xl border shadow-xs flex flex-col justify-between ${
+        {/* 5. Overstay Alert Card (Scrolls to Overdue Guests) */}
+        <button
+          type="button"
+          onClick={scrollToOverstay}
+          className={`col-span-2 sm:col-span-1 p-4 rounded-2xl border shadow-xs hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-150 flex flex-col justify-between text-left cursor-pointer group focus:outline-none focus:ring-2 focus:ring-red-500 ${
             (stats?.overstayCount || 0) > 0
-              ? 'bg-red-50/80 border-red-200 text-red-900 animate-pulse-subtle'
-              : 'bg-white border-slate-200 text-slate-900'
+              ? 'bg-red-50/90 border-red-300 hover:border-red-500 text-red-900'
+              : 'bg-white border-slate-200 hover:border-slate-400 text-slate-900'
           }`}
+          title={isGu ? 'સમય પૂરો થયેલ મહેમાનોની યાદી જુઓ' : 'Click to view overdue stays below'}
         >
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between w-full">
             <span className="text-xs font-bold uppercase tracking-wider text-red-700">
               {isGu ? 'સમય પૂરો (Overstay)' : 'Overstay'}
             </span>
-            <div className="w-8 h-8 rounded-xl bg-red-100 text-red-700 flex items-center justify-center">
+            <div
+              className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 shadow-xs ${
+                (stats?.overstayCount || 0) > 0
+                  ? 'bg-red-200 text-red-800 group-hover:bg-red-600 group-hover:text-white'
+                  : 'bg-slate-100 text-slate-600 group-hover:bg-slate-700 group-hover:text-white'
+              }`}
+            >
               <AlertTriangle className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2">
+          <div className="mt-2 w-full">
             <div className="text-2xl sm:text-3xl font-extrabold text-red-600">
               {loading ? '-' : stats?.overstayCount || 0}
             </div>
-            <div className="text-[11px] text-red-700 mt-0.5 font-semibold">
-              {(stats?.overstayCount || 0) > 0
-                ? isGu
-                  ? 'ધ્યાન આપો / ચેક-આઉટ બાકી'
-                  : 'Requires attention'
-                : isGu
-                ? 'બધા મહેમાનો સમયસર છે'
-                : 'All stays on track'}
+            <div className="text-[11px] text-red-700 mt-1 font-semibold flex items-center justify-between">
+              <span>
+                {(stats?.overstayCount || 0) > 0
+                  ? isGu
+                    ? 'ચેક-આઉટ બાકી'
+                    : 'Requires attention'
+                  : isGu
+                  ? 'બધા સમયસર છે'
+                  : 'All stays on track'}
+              </span>
+              {(stats?.overstayCount || 0) > 0 && (
+                <span className="font-bold text-[10px] bg-red-200/80 group-hover:bg-red-300 px-1.5 py-0.5 rounded-md transition flex items-center gap-0.5">
+                  {isGu ? 'જુઓ ↓' : 'View ↓'}
+                </span>
+              )}
             </div>
           </div>
-        </div>
+        </button>
       </div>
 
-      {/* Live Active Stays Table & Cards */}
-      <div id="active-stays-section" className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden scroll-mt-24">
-        {/* Section Header with Search */}
+      {/* Live Active Stays Table & Cards (Checked-in People Section) */}
+      <div
+        id="active-stays-section"
+        className={`bg-white rounded-2xl border shadow-sm overflow-hidden scroll-mt-24 transition-all duration-500 ${
+          highlightedSection
+            ? 'ring-4 ring-blue-500/40 border-blue-500 shadow-xl'
+            : 'border-slate-200'
+        }`}
+      >
+        {/* Section Header with Filter Tabs & Search */}
         <div className="p-4 sm:p-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5 flex-wrap">
             <h2 className="text-base sm:text-lg font-bold text-slate-900">
               {isGu ? `હાલમાં રોકાયેલા મહેમાનો (${filteredStays.length})` : `Currently Checked-in Guests (${filteredStays.length})`}
             </h2>
+
+            {/* Quick Filter Switch Tabs */}
+            <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-xl text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => setStayFilter('all')}
+                className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                  stayFilter === 'all'
+                    ? 'bg-white text-blue-700 shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {isGu ? `બધા (${activeStays.length})` : `All (${activeStays.length})`}
+              </button>
+              {(stats?.overstayCount || 0) > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setStayFilter('overstay')}
+                  className={`px-2.5 py-1 rounded-lg transition cursor-pointer flex items-center gap-1 ${
+                    stayFilter === 'overstay'
+                      ? 'bg-red-600 text-white shadow-xs'
+                      : 'text-red-700 hover:bg-red-50'
+                  }`}
+                >
+                  <span>{isGu ? 'વિલંબિત' : 'Overdue'}</span>
+                  <span
+                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                      stayFilter === 'overstay' ? 'bg-red-700 text-white' : 'bg-red-100 text-red-800'
+                    }`}
+                  >
+                    {stats?.overstayCount}
+                  </span>
+                </button>
+              )}
+            </div>
+
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
               Live IST
             </span>
@@ -646,10 +767,20 @@ export default function DashboardPage() {
               <Users className="w-6 h-6" />
             </div>
             <h3 className="text-base font-semibold text-slate-800">
-              {isGu ? 'હાલમાં કોઈ મહેમાન રોકાયેલ નથી' : 'No active checked-in guests found'}
+              {stayFilter === 'overstay'
+                ? isGu
+                  ? 'કોઈ વિલંબિત (Overstay) મહેમાન નથી'
+                  : 'No overdue guests found'
+                : isGu
+                ? 'હાલમાં કોઈ મહેમાન રોકાયેલ નથી'
+                : 'No active checked-in guests found'}
             </h3>
             <p className="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto">
-              {searchTerm
+              {stayFilter === 'overstay'
+                ? isGu
+                  ? 'બધા મહેમાનો નિર્ધારિત સમયમાં છે. કોઈ રૂમમાં વિલંબ નથી.'
+                  : 'All guests are currently on track. No rooms are overdue.'
+                : searchTerm
                 ? isGu
                   ? 'શોધ પરિણામ મળ્યું નથી.'
                   : 'No results matched your search query.'
@@ -657,13 +788,23 @@ export default function DashboardPage() {
                 ? 'બધા રૂમ ખાલી છે. નવો ગેસ્ટ ચેક-ઇન કરવા નીચે બટન દબાવો.'
                 : 'All rooms are currently vacant.'}
             </p>
-            <Link
-              href="/check-in"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-700 text-white rounded-xl text-xs font-semibold hover:bg-blue-800 transition"
-            >
-              <PlusCircle className="w-4 h-4" />
-              <span>{isGu ? 'નવો ગેસ્ટ ચેક-ઇન કરો' : 'Check In a Guest'}</span>
-            </Link>
+            {stayFilter === 'overstay' ? (
+              <button
+                type="button"
+                onClick={() => setStayFilter('all')}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-700 text-white rounded-xl text-xs font-semibold hover:bg-blue-800 transition cursor-pointer"
+              >
+                <span>{isGu ? 'બધા રોકાયેલા મહેમાનો જુઓ' : 'View All Active Guests'}</span>
+              </button>
+            ) : (
+              <Link
+                href="/check-in"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-700 text-white rounded-xl text-xs font-semibold hover:bg-blue-800 transition"
+              >
+                <PlusCircle className="w-4 h-4" />
+                <span>{isGu ? 'નવો ગેસ્ટ ચેક-ઇન કરો' : 'Check In a Guest'}</span>
+              </Link>
+            )}
           </div>
         ) : (
           <>

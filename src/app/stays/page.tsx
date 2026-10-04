@@ -96,6 +96,16 @@ export default function StaysListPage() {
   }, [selectedHotelId, statusFilter, page, searchTerm, showToast, isGu]);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const s = params.get('status');
+      if (s && ['all', 'checked_in', 'checked_out', 'overstay'].includes(s)) {
+        setStatusFilter(s as 'all' | 'checked_in' | 'checked_out' | 'overstay');
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     fetchStays();
   }, [fetchStays]);
 

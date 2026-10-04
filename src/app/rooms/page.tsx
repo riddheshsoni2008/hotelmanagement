@@ -74,6 +74,16 @@ export default function RoomsPage() {
   }, [selectedHotelId, statusFilter, showToast, isGu]);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const s = params.get('status');
+      if (s && ['all', 'available', 'occupied', 'maintenance'].includes(s)) {
+        setStatusFilter(s as 'all' | 'available' | 'occupied' | 'maintenance');
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     fetchRooms();
   }, [fetchRooms]);
 
